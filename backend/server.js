@@ -56,6 +56,11 @@ app.use("/api/admin", adminRoutes);
 
 const port = process.env.PORT || 4000;
 
+app.get("/", (req, res) => {
+  res.send("AI for Mental Health Backend is running 🚀");
+});
+
+
 server.listen(port, () => {
   console.log("Server is running on port", port);
 });
