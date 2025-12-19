@@ -25,7 +25,7 @@ app.use(
   cors({
       origin: [
     "http://localhost:4000",
-    "https://ai-for-mental-health-frontend.vercel.app/"
+    "https://ai-for-mental-health-frontend.vercel.app"
   ],
     methods: ["GET", "POST", "PATCH", "DELETE", "PUT"],
     credentials: true,
