@@ -16,7 +16,7 @@ const UpdateJournal = () => {
     useEffect(() => {
         const fetchJournal = async () => {
             try {
-                const response = await axios.get(`http://localhost:4000/${username}/${id}`);
+                const response = await axios.get(`${process.env.REACT_APP_API_URL}/${username}/${id}`);
                 if (response.status === 200) {
                     const { title, article, tags, coverPicture } = response.data;
                     setTitle(title);
@@ -66,7 +66,7 @@ const UpdateJournal = () => {
                 formDataObject[key] = value;
             }
 
-            const response = await axios.put(`http://localhost:4000/journals/${username}/${id}`, formDataObject);
+            const response = await axios.put(`${process.env.REACT_APP_API_URL}/journals/${username}/${id}`, formDataObject);
     
             if (response.status !== 200) {
                 throw new Error('Network response was not ok');

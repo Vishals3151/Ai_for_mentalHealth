@@ -13,7 +13,7 @@ const UserListPage = () => {
       try {
         const token = localStorage.getItem("adminToken");
         const response = await axios.get(
-          "http://localhost:4000/api/admin/users",
+          `${process.env.REACT_APP_API_URL}/api/admin/users`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -33,7 +33,7 @@ const UserListPage = () => {
     if (window.confirm("Are you sure you want to delete this user?")) {
       try {
         const token = localStorage.getItem("adminToken");
-        await axios.delete(`http://localhost:4000/api/admin/users/${userId}`, {
+        await axios.delete(`${process.env.REACT_APP_API_URL}/api/admin/users/${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         // Refresh user list after deletion

@@ -27,7 +27,7 @@ const Therapist = () => {
   useEffect(() => {
     const fetchChatHistory = async () => {
       try {
-        const res = await fetch(`http://localhost:4000/api/chat/${username}`);
+        const res = await fetch(`${process.env.REACT_APP_API_URL}/api/chat/${username}`);
         const data = await res.json();
         if (data.success) setMessages(data.messages);
       } catch (err) {
@@ -40,7 +40,7 @@ const Therapist = () => {
   // Save chat to backend
   const saveChatToServer = async (updatedMessages) => {
     try {
-      await fetch(`http://localhost:4000/api/chat/${username}`, {
+      await fetch(`${process.env.REACT_APP_API_URL}/api/chat/${username}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, messages: updatedMessages }),

@@ -11,7 +11,7 @@ const AnonymousPostListPage = () => {
     const fetchPosts = async () => {
       try {
         const token = localStorage.getItem('adminToken');
-        const response = await axios.get('http://localhost:4000/api/admin/anonymous-posts', {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/admin/anonymous-posts`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         setPosts(response.data);

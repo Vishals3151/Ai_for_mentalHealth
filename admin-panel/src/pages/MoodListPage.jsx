@@ -11,7 +11,7 @@ const MoodListPage = () => {
     const fetchMoods = async () => {
       try {
         const token = localStorage.getItem('adminToken');
-        const response = await axios.get('http://localhost:4000/api/admin/moods', {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/admin/moods`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         setMoods(response.data);

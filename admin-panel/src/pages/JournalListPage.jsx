@@ -10,7 +10,7 @@ const JournalListPage = () => {
   const fetchJournals = async () => {
     try {
       const token = localStorage.getItem('adminToken');
-      const response = await axios.get('http://localhost:4000/api/admin/journals', {
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/admin/journals`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       setJournals(response.data);

@@ -23,7 +23,7 @@ const CreateJournal = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:4000/${user}`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/${user}`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${user}`

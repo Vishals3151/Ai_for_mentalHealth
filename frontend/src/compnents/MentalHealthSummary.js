@@ -22,7 +22,7 @@ const MentalHealthSummary = () => {
 
     const fetchMoods = async () => {
       try {
-        const res = await axios.get(`http://localhost:4000/api/moods/${username}`);
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/moods/${username}`);
         const moods = res.data;
 
         // Group moods by date

@@ -46,7 +46,7 @@ const Navbar = () => {
   const confirmDelete = async () => {
     try {
       // Call the backend route to delete the user
-      await fetch(`http://localhost:4000/delete-user/${user}`, {
+      await fetch(`${process.env.REACT_APP_API_URL}/delete-user/${user}`, {
         method: 'DELETE',
       });
       // Perform logout after deletion

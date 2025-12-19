@@ -19,8 +19,8 @@ const UserDetailPage = () => {
 
         // Fetch user details and user activity in parallel
         const [userRes, activityRes] = await Promise.all([
-          axios.get(`http://localhost:4000/api/admin/users/${userId}`, { headers }),
-          axios.get(`http://localhost:4000/api/admin/users/${userId}/activity`, { headers })
+          axios.get(`${process.env.REACT_APP_API_URL}/api/admin/users/${userId}`, { headers }),
+          axios.get(`${process.env.REACT_APP_API_URL}/api/admin/users/${userId}/activity`, { headers })
         ]);
 
         setUser(userRes.data);
