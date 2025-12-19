@@ -14,7 +14,7 @@ const Readjournal = () => {
     useEffect(() => {
         const fetchJournals = async () => {
             try {
-                const response = await axios.get(`http://localhost:8000/${username}/journals`);
+                const response = await axios.get(`http://localhost:4000/${username}/journals`);
                 setJournals(response.data);
             } catch (error) {
                 console.error('Error fetching journals:', error);
@@ -39,7 +39,7 @@ const Readjournal = () => {
 
     const confirmDelete = async () => {
         try {
-            await axios.delete(`http://localhost:8000/journal-delete/${username}/${journalToDelete}`);
+            await axios.delete(`http://localhost:4000/journal-delete/${username}/${journalToDelete}`);
             // Remove the deleted journal from the state
             setJournals(journals.filter(journal => journal._id !== journalToDelete));
             // Close the confirmation modal

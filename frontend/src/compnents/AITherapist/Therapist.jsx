@@ -1,11 +1,15 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { GoogleGenerativeAI } from '@google/generative-ai';
-import Loader from 'react-js-loader';
-import Navbar from '../navbar/Navbar';
-import './Therapist.css';
+import React, { useState, useEffect, useRef } from "react";
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import Loader from "react-js-loader";
+import Navbar from "../navbar/Navbar";
+import "./Therapist.css";
 
-const API_KEY = process.env.REACT_APP_API_KEY;
+// ✅ Your Gemini API key
+const API_KEY = "AIzaSyBZU_4OMaKevQwEvtuf_C54_ZUWoCJxprs";
 const genAI = new GoogleGenerativeAI(API_KEY);
+
+// Replace this with your logged-in username or state from auth
+const username = "exampleUser";
 
 const TypingAnimation = ({ color }) => (
   <div className="item text-2xl">
@@ -15,51 +19,97 @@ const TypingAnimation = ({ color }) => (
 
 const Therapist = () => {
   const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const chatBoxRef = useRef(null);
+
+  // Fetch chat history on mount
+  useEffect(() => {
+    const fetchChatHistory = async () => {
+      try {
+        const res = await fetch(`http://localhost:4000/api/chat/${username}`);
+        const data = await res.json();
+        if (data.success) setMessages(data.messages);
+      } catch (err) {
+        console.error("Error fetching chat history:", err);
+      }
+    };
+    fetchChatHistory();
+  }, []);
+
+  // Save chat to backend
+  const saveChatToServer = async (updatedMessages) => {
+    try {
+      await fetch(`http://localhost:4000/api/chat/${username}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, messages: updatedMessages }),
+      });
+    } catch (err) {
+      console.error("Error saving chat:", err);
+    }
+  };
 
   const handleSend = async () => {
     if (!input.trim()) return;
 
-    const newMessage = { sender: 'user', text: input };
-    setMessages([...messages, newMessage]);
-    setInput('');
+    const userMessage = { sender: "user", text: input };
+    const updatedMessages = [...messages, userMessage];
+    setMessages(updatedMessages);
+    setInput("");
     setLoading(true);
 
     try {
-      const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-      const prompt = `Analyse the user's input and give suggestions or talk with them and provide an answer in paragraphs with spaces between paragraphs and points. Respond as if you are talking to the user in the first person, not the third person:\n\nUser: ${input}\nTherapist:`;
+      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+
+      const prompt = `You are a kind and supportive therapist.
+Analyse the user's input and respond in a clear **numbered list**, with each point starting on a **new line**.
+Do not combine points in the same line. Do not write paragraphs. Only provide short, readable points.
+
+User: ${input}
+Therapist:`;
+
+      // ✅ Use updated SDK method
       const result = await model.generateContent(prompt);
-      const response = await result.response;
-      let aiMessage = await response.text();
+      let aiMessage = result.response.text();
 
-      // Replace **word** with <strong>word</strong>
-      aiMessage = aiMessage.replace(/\*\*(.*?)\*\*/g, '$1');
+      // Small delay for smooth UX
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      // Simulate typing delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      setMessages([...messages, newMessage, { sender: 'ai', text: aiMessage }]);
+      const finalMessages = [
+        ...updatedMessages,
+        { sender: "ai", text: aiMessage },
+      ];
+      setMessages(finalMessages);
+      saveChatToServer(finalMessages);
     } catch (error) {
-      console.error('Error generating response:', error);
-      setMessages([...messages, newMessage, { sender: 'ai', text: 'An error occurred while generating the response.' }]);
+      console.error("Error generating response:", error);
+
+      let aiText = "⚠️ An error occurred while generating the response.";
+      if (error.message?.includes("429")) {
+        aiText =
+          "⚠️ API limit reached for today. Please try again later or enable billing for more requests.";
+      }
+
+      const finalMessages = [
+        ...updatedMessages,
+        { sender: "ai", text: aiText, error: true },
+      ];
+      setMessages(finalMessages);
+      saveChatToServer(finalMessages);
     } finally {
       setLoading(false);
     }
   };
 
   const handleInputChange = (e) => setInput(e.target.value);
-
   const handleKeyPress = (e) => {
-    if (e.key === 'Enter') handleSend();
+    if (e.key === "Enter") handleSend();
   };
 
   useEffect(() => {
-    // Scroll to the bottom of the chat box whenever messages change
-    if (chatBoxRef.current) {
+    if (chatBoxRef.current)
       chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
-    }
   }, [messages]);
 
   return (
@@ -69,7 +119,16 @@ const Therapist = () => {
         <h1 className="heading">Your Personal AI Assistant</h1>
         <div ref={chatBoxRef} className="chat-box">
           {messages.map((msg, index) => (
-            <div key={index} className={`message ${msg.sender === 'user' ? 'user-message' : 'ai-message'}`}>
+            <div
+              key={index}
+              className={`message ${
+                msg.error
+                  ? "error-message"
+                  : msg.sender === "user"
+                  ? "user-message"
+                  : "ai-message"
+              }`}
+            >
               {msg.text}
             </div>
           ))}
@@ -84,7 +143,9 @@ const Therapist = () => {
             placeholder="Type your message..."
             className="input-field"
           />
-          <button onClick={handleSend} className="send-button">Send</button>
+          <button onClick={handleSend} className="send-button">
+            Send
+          </button>
         </div>
       </div>
     </>

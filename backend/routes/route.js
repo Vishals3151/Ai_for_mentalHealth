@@ -10,6 +10,7 @@ const router = express.Router();
 import upload from '../multer/multerConfig.js';
 import upload1 from '../multer/multerConfig1.js';
 import { getJournalById } from '../controller/journal-controller.js';
+import { saveChat, getChatHistory } from '../controller/chat-controller.js';
 import cors from 'cors';
 
 
@@ -31,6 +32,8 @@ router.get('/:username/journals', getPostsByUsername);
 router.put('/journals/:username/:id', update_journal);
 router.delete('/journal-delete/:username/:id', delete_journal);
 router.get('/:username/:id', getJournalById);
+router.post('/api/chat/:username', saveChat);
+router.get('/api/chat/:username', getChatHistory);
 
 //passport.authenticate('jwt', { session: false })
 

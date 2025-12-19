@@ -18,7 +18,7 @@ const Profile = () => {
     // Function to fetch user details
     const fetchUserDetails = async () => {
       try {
-        const response = await axios.get(`http://localhost:8000/${username}/getuserdetails`);
+        const response = await axios.get(`http://localhost:4000/${username}/getuserdetails`);
         // Set user details in state
         console.log(response);
         setUserDetails(response.data);

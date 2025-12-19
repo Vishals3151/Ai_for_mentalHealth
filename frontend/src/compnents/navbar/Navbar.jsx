@@ -46,7 +46,7 @@ const Navbar = () => {
   const confirmDelete = async () => {
     try {
       // Call the backend route to delete the user
-      await fetch(`http://localhost:8000/delete-user/${user}`, {
+      await fetch(`http://localhost:4000/delete-user/${user}`, {
         method: 'DELETE',
       });
       // Perform logout after deletion
@@ -72,7 +72,7 @@ const Navbar = () => {
           <div className="flex lg:flex-1">
             <a href="/" className="-m-1.5 p-1.5">
               <span className="sr-only">Your Company</span>
-              <img className="h-8 w-auto" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQZrRgwuKA5JrFS4glBVgzvmPDhhPjWrObr-D01xeKZQ&s" alt="Your Company" />
+              <img className="h-12 w-auto" src="/media/images/Logo.jpg" alt="Your Company" />
             </a>
           </div>
           <div className="flex lg:hidden">
@@ -89,8 +89,9 @@ const Navbar = () => {
           </div>
           <div className="hidden lg:flex lg:gap-x-12">
             <a href={`/${user}/mood`} className="text-sm font-semibold leading-6 text-gray-900">Mood Tracker</a>
-            <a href={`/${user}/therapist`} className="text-sm font-semibold leading-6 text-gray-900">AI Therapist</a>
+            <a href="https://swasthmanas.onrender.com/" className="text-sm font-semibold leading-6 text-gray-900">AI Therapist</a>
             <a href={`/${user}/quiz`} className="text-sm font-semibold leading-6 text-gray-900">Quiz</a>
+            <a href={`/${user}/summary`} className="text-sm font-semibold leading-6 text-gray-900">Summary</a>
             <a href={`/${user}/anonymoussharing`} className="text-sm font-semibold leading-6 text-gray-900">Anonymous Sharing</a>
             <a href="/aboutus" className="text-sm font-semibold leading-6 text-gray-900">About Us</a>
           </div>
@@ -151,8 +152,9 @@ const Navbar = () => {
                   <div className="space-y-2 py-6">
 
                     <a href={`/${user}/mood`} className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">Mood Tracker</a>
-                    <a href={`/${user}/therapist`} className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">AI Therapist</a>
+                    <a href="https://swasthmanas.onrender.com/" className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">AI Therapist</a>
                     <a href={`/${user}/quiz`} className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">Quiz</a>
+                    <a to={`/${user}/summary`} className="nav-link">Summary</a>
                     <a href={`/${user}/anonymoussharing`} className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">Anonymous Sharing</a>
                     <a href="/aboutus" className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">About Us</a>
                   </div>

@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
-import { GoogleGenerativeAI } from '@google/generative-ai';
-import Loader from 'react-js-loader';
-import Navbar from '../navbar/Navbar';
+import React, { useState } from "react";
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import Loader from "react-js-loader";
+import Navbar from "../navbar/Navbar";
 
-
-
-const API_KEY = process.env.REACT_APP_API_KEY;
+// ✅ Your Gemini API Key
+const API_KEY = "AIzaSyBZU_4OMaKevQwEvtuf_C54_ZUWoCJxprs";
 const genAI = new GoogleGenerativeAI(API_KEY);
 
 const questions = [
@@ -26,10 +25,15 @@ const questions = [
   "How often do you avoid social situations due to fear of being judged or embarrassed?",
 ];
 
-const options = ["Not at all", "Several days", "More than half the days", "Nearly every day"];
+const options = [
+  "Not at all",
+  "Several days",
+  "More than half the days",
+  "Nearly every day",
+];
 
 const Quiz = () => {
-  const [answers, setAnswers] = useState(Array(questions.length).fill(''));
+  const [answers, setAnswers] = useState(Array(questions.length).fill(""));
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [hoveredOption, setHoveredOption] = useState(null);
@@ -51,74 +55,145 @@ const Quiz = () => {
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-      const prompt = `Analyze the following mental health quiz answers and generate a short summary regarding the persons mental health and what can he do, use points and headings and generate answer separated by paragraphs, also give a space between different paragraphs:\n\n${questions.map((q, i) => `${i+1}. ${q} ${answers[i]}`).join('\n')}`;
+      // ✅ use Gemini flash for higher quota
+      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+
+      const prompt = `
+You are a mental health assistant. Analyze the following quiz answers and generate a clear report with these sections:
+
+1. Summary of Current Mental Health State
+   - Describe overall mood and emotional well-being.
+
+2. Conclusion
+   - Give a short conclusion about the person’s mental health condition (mild, moderate, or severe signs of stress, anxiety, or depression).
+
+3. Suggestions / Recommendations
+   - Provide practical self-care tips and coping strategies.
+   - Suggest whether they may need professional help (if signs seem serious).
+
+Keep the tone supportive and easy to understand. Separate each section with a blank line.
+
+Quiz Answers:
+${questions.map((q, i) => `${i + 1}. ${q} - ${answers[i]}`).join("\n")}
+    `;
+
       const result = await model.generateContent(prompt);
       const response = await result.response;
       let text = await response.text();
-  
-      // Replace **word** with <strong>word</strong>
-      text = text.replace(/\*\*(.*?)\*\*/g, '$1');
-  
+
+      // remove bold formatting
+      text = text.replace(/\*\*(.*?)\*\*/g, "$1");
       setResult(text);
     } catch (error) {
-      console.error('Error analyzing answers:', error);
-      setResult('An error occurred while analyzing the answers.');
+      console.error("Error analyzing answers:", error);
+      setResult("⚠️ An error occurred while analyzing the answers.");
     } finally {
       setLoading(false);
     }
   };
 
+  // 🔍 determine mood badge
+  const getMood = (text) => {
+    if (!text) return null;
+    if (text.toLowerCase().includes("severe"))
+      return { label: "Severe Mood", color: "bg-red-500", emoji: "😟" };
+    if (text.toLowerCase().includes("moderate"))
+      return { label: "Moderate Mood", color: "bg-yellow-500", emoji: "😐" };
+    return { label: "Stable Mood", color: "bg-green-500", emoji: "🙂" };
+  };
+
+  const mood = getMood(result);
+
   return (
     <>
-    <Navbar />
-    <div className="max-w-4xl mx-auto p-6" style={{background: 'linear-gradient(to right, #D1D5DB, #E5E7EB, #F3F4F6)', borderRadius: '1rem', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)', marginTop: '6rem'}}>
-      <h1 className="text-2xl font-bold mb-6 text-center">Mental Health Quiz</h1>
-      {questions.map((question, index) => (
-        <div key={index} className="mb-4 text-black font-bold m-12">
-          <p className={`mb-2 text-lg`}>{`${index+1}. ${question}`}</p>
-          <div className="flex flex-col space-y-2">
-            {options.map((option, optionIndex) => (
-              <label
-                key={optionIndex}
-                className={`flex items-center p-3 px-5 block cursor-pointer rounded-full border border-black border-opacity-20 ${hoveredOption === index ? 'hover:bg-black hover:text-white' : 'hover:bg-gray-200'}`}
-                onMouseEnter={() => handleOptionHover(index)}
-                onMouseLeave={handleOptionLeave}
-              >
-                <input
-                  type="radio"
-                  name={`question-${index}`}
-                  value={option}
-                  checked={answers[index] === option}
-                  onChange={() => handleChange(index, option)}
-                  className="accent-primary"
-                />
-                <span className="ps-3 text-lg font-normal">{option}</span>
-              </label>
-            ))}
+      <Navbar />
+      <div
+        className="max-w-4xl mx-auto p-6"
+        style={{
+          background: "linear-gradient(to right, #D1D5DB, #E5E7EB, #F3F4F6)",
+          borderRadius: "1rem",
+          boxShadow:
+            "0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)",
+          marginTop: "6rem",
+        }}
+      >
+        <h1 className="text-2xl font-bold mb-6 text-center">
+          Mental Health Quiz
+        </h1>
+        {questions.map((question, index) => (
+          <div key={index} className="mb-4 text-black font-bold m-12">
+            <p className="mb-2 text-lg">{`${index + 1}. ${question}`}</p>
+            <div className="flex flex-col space-y-2">
+              {options.map((option, optionIndex) => (
+                <label
+                  key={optionIndex}
+                  className={`flex items-center p-3 px-5 block cursor-pointer rounded-full border border-black border-opacity-20 ${
+                    hoveredOption === index
+                      ? "hover:bg-black hover:text-white"
+                      : "hover:bg-gray-200"
+                  }`}
+                  onMouseEnter={() => handleOptionHover(index)}
+                  onMouseLeave={handleOptionLeave}
+                >
+                  <input
+                    type="radio"
+                    name={`question-${index}`}
+                    value={option}
+                    checked={answers[index] === option}
+                    onChange={() => handleChange(index, option)}
+                    className="accent-primary"
+                  />
+                  <span className="ps-3 text-lg font-normal">{option}</span>
+                </label>
+              ))}
+            </div>
           </div>
-        </div>
-      ))}
-      <button
-  onClick={handleSubmit}
-  className="mt-6 w-half bg-blue-500 hover:bg-blue-700 text-white py-2 px-6 rounded-full transition-colors duration-300 ml-72"
->
-  Submit
-</button>
+        ))}
+        <button
+          onClick={handleSubmit}
+          className="mt-6 w-half bg-blue-500 hover:bg-blue-700 text-white py-2 px-6 rounded-full transition-colors duration-300 ml-72"
+        >
+          Submit
+        </button>
 
-      {loading ? (
-        <div className="flex justify-center mt-6">
-          <Loader type="spinner-cub" bgColor={"#000000"} color={"#FFFFFF"} title={"spinner-cub"} size={100} />
-        </div>
-      ) : (
-        result && (
-          <div className="mt-6 p-4 bg-gray-100 rounded-lg">
-            <h2 className="text-xl font-semibold mb-4">Analysis Result</h2>
-            <p className="whitespace-pre-wrap">{result}</p>
+        {loading ? (
+          <div className="flex justify-center mt-6">
+            <Loader
+              type="spinner-cub"
+              bgColor={"#000000"}
+              color={"#FFFFFF"}
+              title={"spinner-cub"}
+              size={100}
+            />
           </div>
-        )
-      )}
-    </div>
+        ) : (
+          result && (
+            <div
+              className={`mt-6 p-6 rounded-xl shadow-lg ${
+                mood?.label === "Severe Mood"
+                  ? "bg-red-100 border-l-8 border-red-500"
+                  : mood?.label === "Moderate Mood"
+                  ? "bg-yellow-100 border-l-8 border-yellow-500"
+                  : "bg-green-100 border-l-8 border-green-500"
+              }`}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold">🧠 Analysis Result</h2>
+                {mood && (
+                  <span
+                    className={`px-3 py-1 text-sm font-semibold rounded-full flex items-center gap-2 ${mood.color} text-white`}
+                  >
+                    {mood.emoji} {mood.label}
+                  </span>
+                )}
+              </div>
+              <p className="whitespace-pre-wrap leading-relaxed text-gray-800">
+                {result}
+              </p>
+            </div>
+          )
+        )}
+      </div>
     </>
   );
 };
