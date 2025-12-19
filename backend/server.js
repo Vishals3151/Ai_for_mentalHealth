@@ -23,7 +23,10 @@ const server = http.createServer(app); // Create HTTP server
 app.use(express.json());
 app.use(
   cors({
-    origin: "*",
+      origin: [
+    "http://localhost:4000",
+    "https://ai-for-mental-health-frontend.vercel.app/"
+  ],
     methods: ["GET", "POST", "PATCH", "DELETE", "PUT"],
     credentials: true,
   })
